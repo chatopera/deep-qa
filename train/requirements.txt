@@ -1,0 +1,6 @@
+configparser==3.5.0
+nltk==3.2.1
+numpy==1.11.2
+six==1.10.0
+tensorflow==0.11.0rc1
+tqdm==4.10.0

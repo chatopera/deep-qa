@@ -1,0 +1,13 @@
+.vscode/
+*.swp
+*.swo
+**/__pycache__
+
+# train 
+!/train/save/README.md
+!/train/data/README.md
+!/train/logs/README.md
+/train/config.ini
+/train/logs/
+/train/save/
+/train/data/
