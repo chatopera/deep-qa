@@ -9,6 +9,7 @@ save/*
 !save/README.md
 data/*
 !data/README.md
+!data/cornell_movie_dialogs_corpus
 
 # train 
 /train/config.ini
