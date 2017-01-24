@@ -12,4 +12,5 @@ data/*
 !data/cornell_movie_dialogs_corpus
 
 # train 
+/deepqa2/config.ini
 /deepqa2/corpus.ini
