@@ -89,6 +89,13 @@ class Config:
         self.model_save_ckpt = os.path.join(self.model_save_dir, 'model.ckpt')
 
         '''
+        Define corpus
+        '''
+        self.corpus_name = self.ini['corpus']['corpus_name']
+        self.corpus_lines = os.path.join(self.ini['corpus']['corpus_path'], self.ini['corpus']['corpus_lines'])
+        self.corpus_conversations = os.path.join(self.ini['corpus']['corpus_path'], self.ini['corpus']['corpus_conversations'])
+
+        '''
         Define Dataset
         '''
         if not os.path.exists(self.ini['data']['dataset']):
