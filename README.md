@@ -5,6 +5,16 @@ Train and serve QA Model with TensorFlow
 # DeepQA
 Inspired and inherited from [DeepQA](https://github.com/Conchylicultor/DeepQA).
 
+# Pre-process data
+
+## Download data
+Sample Corpus http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html
+
+```
+cd data_creator
+
+```
+
 # Train 
 ## Install
 First, copy *dataset-creator/dialogues/dataset.pkl* to *data/dataset.pkl*.
@@ -15,7 +25,6 @@ pip install -r requirements.txt
 
 ## Configure
 ```
-cd train && mkdir {data,logs,save}
 cp config.sample.ini config.ini # modify keys
 ```
 

@@ -66,9 +66,9 @@ def read_properties():
     conf = {}
     for x in secs:
         conf[x] = {y: config.get(x, y) for y in config.options(x)}
-    conf['data'] = {'save': CONF_DIR + '/save',
-                    'dataset': CONF_DIR + '/data/dataset.pkl'}
-    conf['log']['log_path'] = CONF_DIR + '/logs'
+    conf['data'] = {'save': CONF_DIR + '/../save',
+                    'dataset': CONF_DIR + '/../data/dataset.pkl'}
+    conf['log']['log_path'] = CONF_DIR + '/../logs'
     return conf
 
 @singleton
@@ -85,7 +85,7 @@ class Config:
         self.project_dir = os.getcwd()
         self.model_dir = os.path.join(self.project_dir, 'model')
         self.model_save_tag = "deeplearning.cobra.%s.%s" % (socket.gethostname(), strftime("%Y%m%d.%H%M%S", localtime()))
-        self.model_save_dir = os.path.join(self.project_dir, 'save/' + self.model_save_tag)
+        self.model_save_dir = os.path.join(self.project_dir, '../save/' + self.model_save_tag)
         self.model_save_ckpt = os.path.join(self.model_save_dir, 'model.ckpt')
 
         '''
