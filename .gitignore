@@ -9,7 +9,7 @@ save/*
 !save/README.md
 data/*
 !data/README.md
-!data/cornell_movie_dialogs_corpus
+!data/cornell
 
 # train 
 /deepqa2/config.ini

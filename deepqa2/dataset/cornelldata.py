@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-sys.path.append(os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), os.pardir))
-from config import config
 import os
+import sys
 
 """
 Load the cornell movie dialog corpus.
@@ -24,6 +22,7 @@ Available from here:
 http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html
 
 """
+
 
 class CornellData:
     """
@@ -38,11 +37,15 @@ class CornellData:
         self.lines = {}
         self.conversations = []
 
-        MOVIE_LINES_FIELDS = ["lineID","characterID","movieID","character","text"]
-        MOVIE_CONVERSATIONS_FIELDS = ["character1ID","character2ID","movieID","utteranceIDs"]
+        MOVIE_LINES_FIELDS = ["lineID", "characterID",
+                              "movieID", "character", "text"]
+        MOVIE_CONVERSATIONS_FIELDS = [
+            "character1ID", "character2ID", "movieID", "utteranceIDs"]
 
-        self.lines = self.loadLines(os.path.join(dirName, "movie_lines.txt"), MOVIE_LINES_FIELDS)
-        self.conversations = self.loadConversations(os.path.join(dirName, "movie_conversations.txt"), MOVIE_CONVERSATIONS_FIELDS)
+        self.lines = self.loadLines(os.path.join(
+            dirName, "movie_lines.txt"), MOVIE_LINES_FIELDS)
+        self.conversations = self.loadConversations(os.path.join(
+            dirName, "movie_conversations.txt"), MOVIE_CONVERSATIONS_FIELDS)
 
         # TODO: Cleaner program (merge copy-paste) !!
 
@@ -88,7 +91,8 @@ class CornellData:
                 for i, field in enumerate(fields):
                     convObj[field] = values[i]
 
-                # Convert string to list (convObj["utteranceIDs"] == "['L598485', 'L598486', ...]")
+                # Convert string to list (convObj["utteranceIDs"] ==
+                # "['L598485', 'L598486', ...]")
                 lineIds = eval(convObj["utteranceIDs"])
 
                 # Reassemble lines
@@ -102,6 +106,3 @@ class CornellData:
 
     def getConversations(self):
         return self.conversations
-
-if __name__ == '__main__':
-    print('foo', config.)

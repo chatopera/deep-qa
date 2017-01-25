@@ -24,54 +24,70 @@ import shutil
 from config import config
 from tqdm import tqdm
 from utils import log
+from munch import munchify
 from models.rnn import Model
-from utils.helper import BatchData
+from dataset.textdata import TextData
 from time import localtime, strftime
 
 logger = log.getLogger(__name__)
 
 def main(unused_argv):
-    batch_data = BatchData(config)
+    batch_data = TextData(munchify({
+        'rootDir': config.dataset_root_dir,
+        'corpus': config.corpus_name,
+        'maxLength': config.train_max_length,
+        'maxLengthEnco': config.train_max_length_enco,
+        'maxLengthDeco': config.train_max_length_deco,
+        'datasetTag': '',
+        'test': False,
+        'watsonMode': False,
+        'batchSize': config.train_num_batch_size
+    }))
     with tf.device(None):
         tf_model = Model(config, config.dataset)
     tf_writer = tf.train.SummaryWriter(config.model_save_dir)
-    tf_saver = tf.train.Saver(max_to_keep=200) # Arbitrary limit
+    tf_saver = tf.train.Saver(max_to_keep=200)  # Arbitrary limit
     tf_sess = tf.Session()
     tf_sess.run(tf.initialize_all_variables())
 
     def save_session():
-        """ 
+        """
         Save the model parameters and the variables
         """
         tqdm.write('Checkpoint reached: saving model (don\'t stop the run)...')
         # TODO Save config as parameters.
         # Save the model parameters and the variables
+        logger.info('Save tf session ... %s' % config.model_save_ckpt)
         tf_saver.save(tf_sess, config.model_save_ckpt)
-        logger.info('Copy dataset ...')
+        logger.info('Copy dataset ... %s' % config.model_save_dir)
         shutil.copy(config.dataset_pkl_path, config.model_save_dir)
-        logger.info('Save config.ini ...')
+        logger.info('Save config.ini ... %s' % config.model_save_dir)
         shutil.copy(config.config_ini_path, config.model_save_dir)
         logger.info('Done.')
 
-    mergedSummaries = tf.merge_all_summaries() # Define the summary operator (Warning: Won't appear on the tensorboard graph)
-    tf_writer.add_graph(tf_sess.graph) # Add a Graph into the eventfile.
+    # Define the summary operator (Warning: Won't appear on the tensorboard
+    # graph)
+    mergedSummaries = tf.merge_all_summaries()
+    tf_writer.add_graph(tf_sess.graph)  # Add a Graph into the eventfile.
     train_glob_step = 0
-    try: # If the user exit while training, we still try to save the model
+    try:  # If the user exit while training, we still try to save the model
         for e in range(config.train_num_epoch):
             print()
-            print("----- Epoch {}/{} ; (lr={}) -----".format(e+1, config.train_num_epoch, config.train_learning_rate))
+            print("----- Epoch {}/{} ; (lr={}) -----".format(e + 1,
+                                                             config.train_num_epoch, config.train_learning_rate))
 
-            batches = batch_data.next()
+            batches = batch_data.getBatches()
 
             tic = strftime("%Y-%m-%d %H:%M:%S", localtime())
             for next_batch in tqdm(batches, desc='Training'):
                 ops, feedDict = tf_model.step(next_batch)
-                assert len(ops) == 2 # training, loss
-                _, loss, summary = tf_sess.run(ops + (mergedSummaries,), feedDict)
+                assert len(ops) == 2  # training, loss
+                _, loss, summary = tf_sess.run(
+                    ops + (mergedSummaries,), feedDict)
                 tf_writer.add_summary(summary, train_glob_step)
-                train_glob_step += 1 # number of batch iterations.
+                train_glob_step += 1  # number of batch iterations.
 
-                # Checkpoint 
+                # Checkpoint
                 if train_glob_step % config.train_save_every == 0:
                     save_session()
             toc = strftime("%Y-%m-%d %H:%M:%S", localtime())

@@ -26,6 +26,7 @@ from time import localtime, strftime
 from utils.helper import singleton
 
 CONF_DIR = os.path.dirname(os.path.abspath(__file__))
+print(CONF_DIR)
 
 def get_cfg_dir():
     '''
@@ -66,8 +67,9 @@ def read_properties():
     conf = {}
     for x in secs:
         conf[x] = {y: config.get(x, y) for y in config.options(x)}
-    conf['data'] = {'save': CONF_DIR + '/../save',
-                    'dataset': CONF_DIR + '/../data/dataset.pkl'}
+    conf['data'] = {'rootDir': CONF_DIR + '/..',
+                    'save': CONF_DIR + '/../save',
+                    'dataset': CONF_DIR + '/../data/' + conf['data']['dataset_name']}
     conf['log']['log_path'] = CONF_DIR + '/../logs'
     return conf
 
@@ -82,18 +84,14 @@ class Config:
         Define project params
         '''
         self.config_ini_path = get_cfg_path()
-        self.project_dir = os.getcwd()
-        self.model_dir = os.path.join(self.project_dir, 'model')
         self.model_save_tag = "deeplearning.cobra.%s.%s" % (socket.gethostname(), strftime("%Y%m%d.%H%M%S", localtime()))
-        self.model_save_dir = os.path.join(self.project_dir, '../save/' + self.model_save_tag)
+        self.model_save_dir = os.path.join(CONF_DIR, '../save/' + self.model_save_tag)
         self.model_save_ckpt = os.path.join(self.model_save_dir, 'model.ckpt')
 
         '''
-        Define corpus
+        Define Corpus
         '''
         self.corpus_name = self.ini['corpus']['corpus_name']
-        self.corpus_lines = os.path.join(self.ini['corpus']['corpus_path'], self.ini['corpus']['corpus_lines'])
-        self.corpus_conversations = os.path.join(self.ini['corpus']['corpus_path'], self.ini['corpus']['corpus_conversations'])
 
         '''
         Define Dataset
@@ -104,6 +102,7 @@ class Config:
         with open(self.ini['data']['dataset'], 'rb') as handle:
             self.dataset = pickle.load(handle)
 
+        self.dataset_root_dir = self.ini['data']['rootDir']
         self.dataset_pkl_path = self.ini['data']['dataset']
         self.dataset_word2id = self.dataset["word2id"]
         self.dataset_id2word = self.dataset["id2word"]
@@ -148,7 +147,7 @@ class Config:
 config = Config()
 
 if __name__ == "__main__":
-    conf = read_properties()
+    # conf = read_properties()
     # for x in conf['rule']['blacklist']:
     #     print x
-    print(conf)
+    print(CONF_DIR)

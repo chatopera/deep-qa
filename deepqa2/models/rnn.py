@@ -25,7 +25,7 @@ import tensorflow as tf
 sys.path.append(os.path.join(os.path.dirname(
     os.path.realpath(__file__)), os.pardir))
 
-from utils.helper import Batch
+from dataset.textdata import Batch
 from utils import log
 
 logger = log.getLogger(__name__)
