@@ -16,8 +16,9 @@ pip install -r requirements.txt
 ```
 
 # Pre-process data
+Process data, build vocabulary, word embedding, conversations, etc.
 ```
-cd deepqa2 
+cd deepqa2
 cp config.sample.ini config.ini
 python dataset/preprocesser.py
 ```
@@ -25,15 +26,16 @@ python dataset/preprocesser.py
 Sample Corpus http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html
 
 # Train Model
-
-## Configure
+Train language model with Seq2seq.
 ```
 cp config.sample.ini config.ini # modify keys
 python train.py
 ```
 
-
 # Serve Model
+Provide RESt API to access language model.
 ```
-
+cd deepqa2/serve
+cp db.sample.sqlite3 db.sqlite3 
+../../scripts/start_serving.sh
 ```
