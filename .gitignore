@@ -2,6 +2,7 @@
 *.swp
 *.swo
 **/__pycache__
+nohup.out
 
 logs/*
 !logs/README.md
