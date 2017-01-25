@@ -1,7 +1,15 @@
+## The following requirements were added by pip freeze:
+asgi-redis==1.0.0
+autopep8==1.2.4
+channels==0.17.3
 configparser==3.5.0
-nltk==3.2.1
-numpy==1.11.2
-six==1.10.0
-tqdm==4.10.0
+Django==1.10.4
+djangorestframework==3.5.3
+jieba==0.38
 munch==2.1.0
+nltk==3.2.1
+numpy==1.11.3
+six==1.10.0
 tensorflow==0.11.0rc2
+terminado==0.6
+tqdm==4.10.0

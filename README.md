@@ -31,3 +31,9 @@ Sample Corpus http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.h
 cp config.sample.ini config.ini # modify keys
 python train.py
 ```
+
+
+# Serve Model
+```
+
+```

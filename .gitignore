@@ -14,3 +14,7 @@ data/*
 
 # train 
 /deepqa2/config.ini
+
+# serve
+/deepqa2/serve/db.sqlite3
+/deepqa2/serve/dump.rdb
