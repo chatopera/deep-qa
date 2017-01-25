@@ -13,4 +13,3 @@ data/*
 
 # train 
 /deepqa2/config.ini
-/deepqa2/corpus.ini

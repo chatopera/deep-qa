@@ -91,7 +91,6 @@ class Config:
         '''
         Define Corpus
         '''
-        self.corpus_name = self.ini['corpus']['corpus_name']
 
         '''
         Define Dataset
@@ -107,6 +106,7 @@ class Config:
         self.dataset_word2id = self.dataset["word2id"]
         self.dataset_id2word = self.dataset["id2word"]
         self.dataset_trainingSamples = self.dataset["trainingSamples"]
+        self.corpus_name = self.dataset["corpusName"]
 
         self.dataset_padToken = self.dataset_word2id["<pad>"]
         self.dataset_goToken = self.dataset_word2id["<go>"]

@@ -248,7 +248,8 @@ class TextData:
                 "word2id": self.word2id,
                 "id2word": self.id2word,
                 "trainingSamples": self.trainingSamples,
-                "maxLength": self.args.maxLength
+                "maxLength": self.args.maxLength,
+                "corpusName": self.args.corpus
             }
             # Using the highest protocol available
             pickle.dump(data, handle, -1)

@@ -28,7 +28,7 @@ def get_cfg_path():
     '''
     Get cfg path
     '''
-    return os.path.join(CONF_DIR, 'corpus.ini')
+    return os.path.join(CONF_DIR, 'config.ini')
 
 
 def load_config():
@@ -46,14 +46,12 @@ def load_config():
 
 
 def main():
-    print(load_config().get('corpus', 'corpus_name'))
     config = load_config()
-    # cornell_data = CornellData(config.get('corpus', 'corpus_path'))
-    # print(cornell_data.getConversations())
+    print('Corpus Name %s' % config.get('corpus', 'corpus_name'))
     train_max_length = config.getint('corpus', 'corpus_max_length')
     train_max_length_enco = train_max_length
     train_max_length_deco = train_max_length + 2
-    print(train_max_length)
+    print('Max Length %d' % train_max_length)
     td = TextData(munchify({'rootDir': config.get('corpus', 'corpus_path'),
                             'corpus': config.get('corpus', 'corpus_name'),
                             'maxLength': train_max_length,
