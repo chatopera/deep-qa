@@ -4,6 +4,7 @@
 Train and serve QA Model with TensorFlow
 
 Tested with TensorFlow#0.11.0rc2, Python#3.5.
+[Install Nvidia Drivers, CUDNn, Python, TensorFlow on Ubuntu 16.04](https://gist.github.com/Samurais/e20a8283708d37f1d7c9a709e9332429)
 
 # DeepQA
 Inspired and inherited from [DeepQA](https://github.com/Conchylicultor/DeepQA).
