@@ -25,21 +25,25 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 import os
+import sys
+# import config
+sys.path.append(os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), os.pardir, os.pardir))
+from config import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['CHATBOT_SECRET_KEY']
+SECRET_KEY = config.ini['serve']['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['philly-nnm.snaplingo.net', '127.0.0.1']
+ALLOWED_HOSTS = [config.ini['serve']['hostname'], '127.0.0.1']
 
 # Application definition
 
@@ -127,12 +131,12 @@ LOGGING = {
         'file_django': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'logs/debug_django.log',
+            'filename': config.ini['log']['log_path'] + '/debug_django.log',
         },
         'file_chatbot': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'logs/debug_chatbot.log',
+            'filename': config.ini['log']['log_path'] + '/debug_chatbot.log',
         },
         'console': {
             'level': 'DEBUG',

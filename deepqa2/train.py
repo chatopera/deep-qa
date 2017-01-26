@@ -31,6 +31,7 @@ from time import localtime, strftime
 
 logger = log.getLogger(__name__)
 
+
 def main(unused_argv):
     batch_data = TextData(munchify({
         'rootDir': config.dataset_root_dir,
@@ -59,8 +60,19 @@ def main(unused_argv):
         # Save the model parameters and the variables
         logger.info('Save tf session ... %s' % config.model_save_ckpt)
         tf_saver.save(tf_sess, config.model_save_ckpt)
-        logger.info('Copy dataset ... %s' % config.model_save_dir)
-        shutil.copy(config.dataset_pkl_path, config.model_save_dir)
+
+        logger.info('Copy source code ... %s' % config.model_save_dir)
+        sourcecode_path = os.path.join(config.model_save_dir, 'deepqa2')
+        if not os.path.exists(sourcecode_path):
+            shutil.copytree(os.path.join(config.base_dir,
+                                     'deepqa2'), sourcecode_path)
+
+        dataset_path = os.path.join(config.model_save_dir, 'data')
+        logger.info('Copy dataset ... %s' % dataset_path)
+        if not os.path.exists(dataset_path):
+            os.makedirs(dataset_path)
+        shutil.copy(config.dataset_pkl_path, dataset_path)
+
         logger.info('Save config.ini ... %s' % config.model_save_dir)
         shutil.copy(config.config_ini_path, config.model_save_dir)
         logger.info('Done.')

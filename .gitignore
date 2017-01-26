@@ -13,7 +13,7 @@ data/*
 !data/cornell
 
 # train 
-/deepqa2/config.ini
+config.ini
 
 # serve
 /deepqa2/serve/db.sqlite3
