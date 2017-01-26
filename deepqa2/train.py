@@ -65,7 +65,11 @@ def main(unused_argv):
         sourcecode_path = os.path.join(config.model_save_dir, 'deepqa2')
         if not os.path.exists(sourcecode_path):
             shutil.copytree(os.path.join(config.base_dir,
-                                     'deepqa2'), sourcecode_path)
+                                         'deepqa2'), sourcecode_path)
+
+        logger.info('Create logs dir ...')
+        if not os.path.exists(os.path.join(config.model_save_dir, 'logs')):
+            os.makedirs(os.path.join(config.model_save_dir, 'logs'))
 
         dataset_path = os.path.join(config.model_save_dir, 'data')
         logger.info('Copy dataset ... %s' % dataset_path)

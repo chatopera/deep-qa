@@ -30,50 +30,15 @@ from models.rnn import Model
 
 logger = logging.getLogger(__name__)
 
-# load model config file
-logger.info("get model path %s" % config.ini['serve']['model_dir'])
-model_config = configparser.ConfigParser()
-model_config.read(os.path.join(config.ini['serve']['model_dir'], 'config.ini'))
-
-
-def _initBot():
-    '''
-    Init Bot Service
-    '''
-    # load text data
-    td = TextData(munchify({
-        'rootDir': config.dataset_root_dir,
-        'corpus': config.corpus_name,
-        'maxLength': config.train_max_length,
-        'maxLengthEnco': config.train_max_length_enco,
-        'maxLengthDeco': config.train_max_length_deco,
-        'datasetTag': '',
-        'test': False,
-        'watsonMode': False,
-        'batchSize': config.train_num_batch_size
-    }))
-    # restore model
-    with tf.device(None):
-        tf_model = Model(config, config.dataset)
-    tf_saver = tf.train.Saver(max_to_keep=200)
-    tf_session = tf.Session()
-    tf_session.run(tf.initialize_all_variables())
-    tf_saver.restore(
-        tf_session, '/Users/hain/snaplingo/deeplearning/chatbot_cobra/serve/addon/model/model.ckpt')
-    # enable predict method
-
-
-def predict(sentence):
-    pass
-
-
 class ChatbotManager(AppConfig):
     """ Manage a single instance of the chatbot shared over the website
     """
     name = 'api'
-    verbose_name = 'DeepQA2 RESt API'
-
+    td = None
     inited = False
+    tf_model = None
+    tf_session = None
+    verbose_name = 'DeepQA2 RESt API'
 
     def ready(self):
         """ Called by Django only once during startup
@@ -90,20 +55,56 @@ class ChatbotManager(AppConfig):
         """
         if not ChatbotManager.inited:
             logger.info('Initializing bot ...')
-            _initBot()
+                # load text data
+            ChatbotManager.td = TextData(munchify({
+                'rootDir': config.dataset_root_dir,
+                'corpus': config.corpus_name,
+                'maxLength': config.train_max_length,
+                'maxLengthEnco': config.train_max_length_enco,
+                'maxLengthDeco': config.train_max_length_deco,
+                'datasetTag': '',
+                'test': False,
+                'watsonMode': False,
+                'batchSize': config.train_num_batch_size
+            }))
+            
+            # restore model
+            with tf.device(None):
+                ChatbotManager.tf_model = Model(config, config.dataset)
+            tf_saver = tf.train.Saver(max_to_keep=200)
+            ChatbotManager.tf_session = tf.Session()
+            ChatbotManager.tf_session.run(tf.initialize_all_variables())
+            logger.info('restore previous model ... %s' %
+                        os.path.join(config.base_dir, 'model.ckpt'))
+            tf_saver.restore(ChatbotManager.tf_session, os.path.join(config.base_dir, 'model.ckpt'))
             ChatbotManager.inited = True
         else:
             logger.info('Bot already initialized.')
 
     @staticmethod
-    def callBot(sentence):
+    def callBot(sentence, questionSeq = None):
         """ Use the previously instantiated bot to predict a response to the given sentence
         Args:
             sentence (str): the question to answer
+            questionSeq (List<int>): output argument. If given will contain the input batch sequence
         Return:
-            str: the answer
+            list <int>: the word ids corresponding to the answer
         """
+        logger.info('callBot %s' % sentence)
         if ChatbotManager.inited:
-            return 'ChatbotManager.bot.daemonPredict(sentence)'
+            batch = ChatbotManager.td.sentence2enco(sentence)
+            logger.info('Get result from model2 ...')
+            if not batch:
+                return None
+            if questionSeq is not None:  # If the caller want to have the real input
+                questionSeq.extend(batch.encoderSeqs)
+            # Run the model
+            logger.info('Get result from model3 ...')
+            ops, feedDict = ChatbotManager.tf_model.step(batch)
+            # TODO: Summarize the output too (histogram, ...)
+            output = ChatbotManager.tf_session.run(ops[0], feedDict)
+            answer = ChatbotManager.td.deco2sentence(output)
+            logger.info('answer<< %s' % answer)
+            return answer
         else:
             logger.error('Error: Bot not initialized!')
