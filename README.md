@@ -34,7 +34,24 @@ python deepqa2/train.py
 # Serve Model
 Provide RESt API to access language model.
 ```
-cd deepqa2/serve
+cd DeepQA2/save/deeplearning.cobra.vulcan.20170127.175256/deepqa2/serve
 cp db.sample.sqlite3 db.sqlite3 
-../../scripts/start_serving.sh
+python manage.py runserver 0.0.0.0:8000
+```
+
+Access Service with RESt API
+```
+POST /api/v1/question HTTP/1.1
+Host: 127.0.0.1:8000
+Content-Type: application/json
+Authorization: Basic YWRtaW46cGFzc3dvcmQxMjM=
+Cache-Control: no-cache
+
+{"message": "good to know"}
+
+response
+{
+  "rc": 0,
+  "msg": "hello"
+}
 ```

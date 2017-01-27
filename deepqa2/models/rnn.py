@@ -19,7 +19,8 @@
 Model to predict the next sentence given an input sequence
 
 """
-import sys, os
+import sys
+import os
 import tensorflow as tf
 
 sys.path.append(os.path.join(os.path.dirname(
@@ -30,10 +31,12 @@ from utils import log
 
 logger = log.getLogger(__name__)
 
+
 class ProjectionOp:
     """ Single layer perceptron
     Project input tensor on the output dimension
     """
+
     def __init__(self, shape, scope=None, dtype=None):
         """
         Args:
@@ -50,7 +53,8 @@ class ProjectionOp:
             self.W = tf.get_variable(
                 'weights',
                 shape,
-                # initializer=tf.truncated_normal_initializer()  # TODO: Tune value (fct of input size: 1/sqrt(input_dim))
+                # initializer=tf.truncated_normal_initializer()  # TODO: Tune
+                # value (fct of input size: 1/sqrt(input_dim))
                 dtype=dtype
             )
             self.b = tf.get_variable(
@@ -82,7 +86,7 @@ class Model:
         2 LTSM layers
     """
 
-    def __init__(self, args, dataset):
+    def __init__(self, args, dataset, is_serve=False):
         """
         Args:
             args: parameters of the model
@@ -93,10 +97,11 @@ class Model:
         self.dataset = dataset  # Keep a reference on the dataset
         self.args = args  # Keep track of the parameters of the model
         self.dtype = tf.float32
+        self.is_serve = is_serve
 
         # Placeholders
-        self.encoderInputs  = None
-        self.decoderInputs  = None  # Same that decoderTarget plus the <go>
+        self.encoderInputs = None
+        self.decoderInputs = None  # Same that decoderTarget plus the <go>
         self.decoderTargets = None
         self.decoderWeights = None  # Adjust the learning to the target sentence size
 
@@ -115,9 +120,11 @@ class Model:
         # TODO: Create name_scopes (for better graph visualisation)
         # TODO: Use buckets (better perfs)
 
-        # Parameters of sampled softmax (needed for attention mechanism and a large vocabulary size)
+        # Parameters of sampled softmax (needed for attention mechanism and a
+        # large vocabulary size)
         outputProjection = None
-        # Sampled softmax only makes sense if we sample less than vocabulary size.
+        # Sampled softmax only makes sense if we sample less than vocabulary
+        # size.
         if 0 < self.args.train_softmax_samples < len(self.dataset['word2id']):
             outputProjection = ProjectionOp(
                 (self.args.train_hidden_size, len(self.dataset['word2id'])),
@@ -126,13 +133,15 @@ class Model:
             )
 
             def sampledSoftmax(inputs, labels):
-                labels = tf.reshape(labels, [-1, 1])  # Add one dimension (nb of true classes, here 1)
+                # Add one dimension (nb of true classes, here 1)
+                labels = tf.reshape(labels, [-1, 1])
 
                 # We need to compute the sampled_softmax_loss using 32bit floats to
                 # avoid numerical instabilities.
-                localWt     = tf.cast(tf.transpose(outputProjection.W), tf.float32)
-                localB      = tf.cast(outputProjection.b,               tf.float32)
-                localInputs = tf.cast(inputs,                           tf.float32)
+                localWt = tf.cast(tf.transpose(outputProjection.W), tf.float32)
+                localB = tf.cast(outputProjection.b,               tf.float32)
+                localInputs = tf.cast(inputs,
+                                      tf.float32)
 
                 return tf.cast(
                     tf.nn.sampled_softmax_loss(
@@ -140,57 +149,81 @@ class Model:
                         localB,
                         localInputs,
                         labels,
-                        self.args.train_softmax_samples,  # The number of classes to randomly sample per batch
+                        # The number of classes to randomly sample per batch
+                        self.args.train_softmax_samples,
                         len(self.dataset['word2id'])),  # The number of classes
                     self.dtype)
 
         # Creation of the rnn cell
-        encoDecoCell = tf.nn.rnn_cell.BasicLSTMCell(self.args.train_hidden_size, state_is_tuple=True)  # Or GRUCell, LSTMCell(args.hiddenSize)
-        #encoDecoCell = tf.nn.rnn_cell.DropoutWrapper(encoDecoCell, input_keep_prob=1.0, output_keep_prob=1.0)  # TODO: Custom values (WARNING: No dropout when testing !!!)
-        encoDecoCell = tf.nn.rnn_cell.MultiRNNCell([encoDecoCell] * self.args.train_num_layers, state_is_tuple=True)
+        encoDecoCell = tf.nn.rnn_cell.BasicLSTMCell(
+            self.args.train_hidden_size, state_is_tuple=True)  # Or GRUCell, LSTMCell(args.hiddenSize)
+        # encoDecoCell = tf.nn.rnn_cell.DropoutWrapper(encoDecoCell,
+        # input_keep_prob=1.0, output_keep_prob=1.0)  # TODO: Custom values
+        # (WARNING: No dropout when testing !!!)
+        encoDecoCell = tf.nn.rnn_cell.MultiRNNCell(
+            [encoDecoCell] * self.args.train_num_layers, state_is_tuple=True)
 
         # Network input (placeholders)
 
         with tf.name_scope('placeholder_encoder'):
-            self.encoderInputs  = [tf.placeholder(tf.int32,   [None, ]) for _ in range(self.args.train_max_length_enco)]  # Batch size * sequence length * input dim
+            self.encoderInputs = [tf.placeholder(tf.int32,   [None, ]) for _ in range(
+                self.args.train_max_length_enco)]  # Batch size * sequence length * input dim
 
         with tf.name_scope('placeholder_decoder'):
-            self.decoderInputs  = [tf.placeholder(tf.int32,   [None, ], name='inputs') for _ in range(self.args.train_max_length_deco)]  # Same sentence length for input and output (Right ?)
-            self.decoderTargets = [tf.placeholder(tf.int32,   [None, ], name='targets') for _ in range(self.args.train_max_length_deco)]
-            self.decoderWeights = [tf.placeholder(tf.float32, [None, ], name='weights') for _ in range(self.args.train_max_length_deco)]
+            self.decoderInputs = [tf.placeholder(tf.int32,   [None, ], name='inputs') for _ in range(
+                self.args.train_max_length_deco)]  # Same sentence length for input and output (Right ?)
+            self.decoderTargets = [tf.placeholder(
+                tf.int32,   [None, ], name='targets') for _ in range(self.args.train_max_length_deco)]
+            self.decoderWeights = [tf.placeholder(
+                tf.float32, [None, ], name='weights') for _ in range(self.args.train_max_length_deco)]
 
         # Define the network
         # Here we use an embedding model, it takes integer as input and convert them into word vector for
         # better word representation
         decoderOutputs, states = tf.nn.seq2seq.embedding_rnn_seq2seq(
-            self.encoderInputs,  # List<[batch=?, inputDim=1]>, list of size args.maxLength
-            self.decoderInputs,  # For training, we force the correct output (feed_previous=False)
+            # List<[batch=?, inputDim=1]>, list of size args.maxLength
+            self.encoderInputs,
+            # For training, we force the correct output (feed_previous=False)
+            self.decoderInputs,
             encoDecoCell,
             len(self.dataset['word2id']),
-            len(self.dataset['word2id']),  # Both encoder and decoder have the same number of class
+            # Both encoder and decoder have the same number of class
+            len(self.dataset['word2id']),
             embedding_size=self.args.train_num_embedding,  # Dimension of each word
             output_projection=outputProjection.getWeights() if outputProjection else None,
-            feed_previous=False  # When we test (self.args.test), we use previous output as next input (feed_previous)
+            # When we serve, we use previous output as next
+            # input (feed_previous)
+            feed_previous=self.is_serve
         )
- 
-        # Finally, we define the loss function
-        self.lossFct = tf.nn.seq2seq.sequence_loss(
-            decoderOutputs,
-            self.decoderTargets,
-            self.decoderWeights,
-            len(self.dataset['word2id']),
-            softmax_loss_function= sampledSoftmax if outputProjection else None  # If None, use default SoftMax
-        )
-        tf.scalar_summary('loss', self.lossFct)  # Keep track of the cost
 
-        # Initialize the optimizer
-        opt = tf.train.AdamOptimizer(
-            learning_rate=self.args.train_learning_rate,
-            beta1=0.9,
-            beta2=0.999,
-            epsilon=1e-08
-        )
-        self.optOp = opt.minimize(self.lossFct)
+        if self.is_serve:
+            if not outputProjection:
+                self.outputs = decoderOutputs
+            else:
+                self.outputs = [outputProjection(
+                    output) for output in decoderOutputs]
+            # TODO: Attach a summary to visualize the output
+        else:
+            # For training only
+            # Finally, we define the loss function
+            self.lossFct = tf.nn.seq2seq.sequence_loss(
+                decoderOutputs,
+                self.decoderTargets,
+                self.decoderWeights,
+                len(self.dataset['word2id']),
+                # If None, use default SoftMax
+                softmax_loss_function=sampledSoftmax if outputProjection else None
+            )
+            tf.scalar_summary('loss', self.lossFct)  # Keep track of the cost
+
+            # Initialize the optimizer
+            opt = tf.train.AdamOptimizer(
+                learning_rate=self.args.train_learning_rate,
+                beta1=0.9,
+                beta2=0.999,
+                epsilon=1e-08
+            )
+            self.optOp = opt.minimize(self.lossFct)
 
     def step(self, batch):
         """ Forward/training step operation.
@@ -203,15 +236,23 @@ class Model:
 
         # Feed the dictionary
         feedDict = {}
-        
-        for i in range(self.args.train_max_length_enco):
-            feedDict[self.encoderInputs[i]]  = batch.encoderSeqs[i]
-        for i in range(self.args.train_max_length_deco):
-            feedDict[self.decoderInputs[i]]  = batch.decoderSeqs[i]
-            feedDict[self.decoderTargets[i]] = batch.targetSeqs[i]
-            feedDict[self.decoderWeights[i]] = batch.weights[i]
+        ops = None
 
-        ops = (self.optOp, self.lossFct)
+        if not self.is_serve: # Training
+            for i in range(self.args.train_max_length_enco):
+                feedDict[self.encoderInputs[i]] = batch.encoderSeqs[i]
+            for i in range(self.args.train_max_length_deco):
+                feedDict[self.decoderInputs[i]] = batch.decoderSeqs[i]
+                feedDict[self.decoderTargets[i]] = batch.targetSeqs[i]
+                feedDict[self.decoderWeights[i]] = batch.weights[i]
+
+            ops = (self.optOp, self.lossFct)
+        else:  # Serve (batchSize == 1)
+            for i in range(self.args.train_max_length_enco):
+                feedDict[self.encoderInputs[i]]  = batch.encoderSeqs[i]
+            feedDict[self.decoderInputs[0]]  = [self.dataset['word2id']['<go>']]
+
+            ops = (self.outputs,)
 
         # Return one pass operator
         return ops, feedDict

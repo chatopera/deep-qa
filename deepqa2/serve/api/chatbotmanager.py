@@ -30,6 +30,7 @@ from models.rnn import Model
 
 config = Config()
 logger = logging.getLogger(__name__)
+tf.logging.set_verbosity(tf.logging.DEBUG)
 
 
 class ChatbotManager(AppConfig):
@@ -40,6 +41,7 @@ class ChatbotManager(AppConfig):
     inited = False
     tf_model = None
     tf_session = None
+    tf_saver = None
     verbose_name = 'DeepQA2 RESt API'
 
     def ready(self):
@@ -72,17 +74,42 @@ class ChatbotManager(AppConfig):
 
             # restore model
             with tf.device(None):
-                ChatbotManager.tf_model = Model(config, config.dataset)
-            tf_saver = tf.train.Saver(max_to_keep=200)
+                ChatbotManager.tf_model = Model(
+                    config, config.dataset, is_serve=True)
+            ChatbotManager.tf_saver = tf.train.Saver()
             ChatbotManager.tf_session = tf.Session()
             ChatbotManager.tf_session.run(tf.initialize_all_variables())
             logger.info('restore previous model ... %s' %
                         os.path.join(config.root_dir, 'model.ckpt'))
-            tf_saver.restore(ChatbotManager.tf_session,
-                             os.path.join(config.root_dir, 'model.ckpt'))
+            ChatbotManager.tf_saver.restore(ChatbotManager.tf_session,
+                                            os.path.join(config.root_dir, 'model.ckpt'))
             ChatbotManager.inited = True
         else:
             logger.info('Bot already initialized.')
+
+    @staticmethod
+    def singlePredict(question, questionSeq=None):
+        """ Predict the sentence
+        Args:
+            question (str): the raw input sentence
+            questionSeq (List<int>): output argument. If given will contain the input batch sequence
+        Return:
+            list <int>: the word ids corresponding to the answer
+        """
+        # Create the input batch
+        batch = ChatbotManager.td.sentence2enco(question)
+        if not batch:
+            return None
+        if questionSeq is not None:  # If the caller want to have the real input
+            questionSeq.extend(batch.encoderSeqs)
+
+        # Run the model
+        ops, feedDict = ChatbotManager.tf_model.step(batch)
+        # TODO: Summarize the output too (histogram, ...)
+        output = ChatbotManager.tf_session.run(ops[0], feedDict)
+        answer = ChatbotManager.td.deco2sentence(output)
+
+        return answer
 
     @staticmethod
     def callBot(sentence, questionSeq=None):
@@ -95,20 +122,10 @@ class ChatbotManager(AppConfig):
         """
         logger.info('callBot %s' % sentence)
         if ChatbotManager.inited:
-            batch = ChatbotManager.td.sentence2enco(sentence)
-            logger.info('Get result from model2 ...')
-            if not batch:
-                return None
-            if questionSeq is not None:  # If the caller want to have the real input
-                questionSeq.extend(batch.encoderSeqs)
-            # Run the model
-            logger.info('Get result from model3 ...')
-            ops, feedDict = ChatbotManager.tf_model.step(batch)
-            # TODO: Summarize the output too (histogram, ...)
-            output = ChatbotManager.tf_session.run(ops[0], feedDict)
-            logger.info(output)
-            answer = ChatbotManager.td.deco2sentence(output)
-            logger.info('answer<< %s' % answer)
+            answer = ChatbotManager.td.sequence2str(
+                ChatbotManager.singlePredict(sentence),
+                clean=True
+            )
             return answer
         else:
             logger.error('Error: Bot not initialized!')

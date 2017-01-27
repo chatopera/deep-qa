@@ -64,7 +64,7 @@ def main(unused_argv):
         logger.info('Copy source code ... %s' % config.model_save_dir)
         sourcecode_path = os.path.join(config.model_save_dir, 'deepqa2')
         if not os.path.exists(sourcecode_path):
-            shutil.copytree(os.path.join(config.base_dir,
+            shutil.copytree(os.path.join(config.root_dir,
                                          'deepqa2'), sourcecode_path)
 
         logger.info('Create logs dir ...')
