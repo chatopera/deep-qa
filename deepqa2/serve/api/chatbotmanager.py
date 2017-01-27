@@ -21,14 +21,16 @@ import tensorflow as tf
 from django.conf import settings
 from django.apps import AppConfig
 # import config
-sys.path.append(os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), os.pardir, os.pardir))
-from config import config
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.realpath(__file__)))))
+from config import Config
 from dataset.textdata import TextData
 from munch import munchify
 from models.rnn import Model
 
+config = Config()
 logger = logging.getLogger(__name__)
+
 
 class ChatbotManager(AppConfig):
     """ Manage a single instance of the chatbot shared over the website
@@ -55,9 +57,9 @@ class ChatbotManager(AppConfig):
         """
         if not ChatbotManager.inited:
             logger.info('Initializing bot ...')
-                # load text data
+            # load text data
             ChatbotManager.td = TextData(munchify({
-                'rootDir': config.dataset_root_dir,
+                'rootDir': config.root_dir,
                 'corpus': config.corpus_name,
                 'maxLength': config.train_max_length,
                 'maxLengthEnco': config.train_max_length_enco,
@@ -67,7 +69,7 @@ class ChatbotManager(AppConfig):
                 'watsonMode': False,
                 'batchSize': config.train_num_batch_size
             }))
-            
+
             # restore model
             with tf.device(None):
                 ChatbotManager.tf_model = Model(config, config.dataset)
@@ -75,14 +77,15 @@ class ChatbotManager(AppConfig):
             ChatbotManager.tf_session = tf.Session()
             ChatbotManager.tf_session.run(tf.initialize_all_variables())
             logger.info('restore previous model ... %s' %
-                        os.path.join(config.base_dir, 'model.ckpt'))
-            tf_saver.restore(ChatbotManager.tf_session, os.path.join(config.base_dir, 'model.ckpt'))
+                        os.path.join(config.root_dir, 'model.ckpt'))
+            tf_saver.restore(ChatbotManager.tf_session,
+                             os.path.join(config.root_dir, 'model.ckpt'))
             ChatbotManager.inited = True
         else:
             logger.info('Bot already initialized.')
 
     @staticmethod
-    def callBot(sentence, questionSeq = None):
+    def callBot(sentence, questionSeq=None):
         """ Use the previously instantiated bot to predict a response to the given sentence
         Args:
             sentence (str): the question to answer
@@ -103,6 +106,7 @@ class ChatbotManager(AppConfig):
             ops, feedDict = ChatbotManager.tf_model.step(batch)
             # TODO: Summarize the output too (histogram, ...)
             output = ChatbotManager.tf_session.run(ops[0], feedDict)
+            logger.info(output)
             answer = ChatbotManager.td.deco2sentence(output)
             logger.info('answer<< %s' % answer)
             return answer

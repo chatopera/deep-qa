@@ -153,4 +153,5 @@ if __name__ == "__main__":
     # conf = read_properties()
     # for x in conf['rule']['blacklist']:
     #     print x
-    print('basedir %s' % config.base_dir)
+    config = Config()
+    print('rootDir %s' % config.root_dir)
