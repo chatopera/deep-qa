@@ -19,21 +19,25 @@ Simple Logging Service
 '''
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), os.pardir))
-from config import config
+sys.path.append(os.path.dirname(os.path.dirname(
+    os.path.realpath(__file__))))
+from config import read_properties
 import logging
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-log_file = '%s/root.log' % config.ini['log']['log_path']
+config = read_properties()
+
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+log_file = '%s/root.log' % config['log']['log_path']
 print('Saving logs into', log_file)
 
 fh = logging.FileHandler(log_file)
 fh.setFormatter(formatter)
-fh.setLevel(config.ini['log']['log_level'])
+fh.setLevel(config['log']['log_level'])
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
-ch.setLevel(config.ini['log']['log_level'])
+ch.setLevel(config['log']['log_level'])
+
 
 def getLogger(logger_name):
     logger = logging.getLogger(logger_name)

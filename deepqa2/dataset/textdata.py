@@ -19,13 +19,18 @@ Loads the dialogue corpus, builds the vocabulary
 
 import numpy as np
 import nltk  # For tokenize
-from tqdm import tqdm  # Progress bar
 import pickle  # Saving the data
 import math  # For float comparison
 import os  # Checking file existance
 import random
-
+from tqdm import tqdm  # Progress bar
 from dataset.cornelldata import CornellData
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(
+    os.path.realpath(__file__))))
+from utils import log
+
+logger = log.getLogger(__name__)
 
 class Batch:
     """Struct containing batches info
@@ -71,7 +76,7 @@ class TextData:
         self.loadCorpus(self.samplesDir)
 
         # Plot some stats:
-        print('Loaded {}: {} words, {} QA'.format(
+        logger.info('Loaded {}: {} words, {} QA'.format(
             self.args.corpus, len(self.word2id), len(self.trainingSamples)))
 
     def _constructName(self):
@@ -94,7 +99,7 @@ class TextData:
     def shuffle(self):
         """Shuffle the training samples
         """
-        print("Shuffling the dataset...")
+        logger.info("Shuffling the dataset...")
         random.shuffle(self.trainingSamples)
 
     def _createBatch(self, samples):
@@ -220,7 +225,7 @@ class TextData:
             datasetExist = True
 
         if not datasetExist:  # First time we load the database: creating all files
-            print('Training samples not found. Creating dataset...')
+            logger.info('Training samples not found. Creating dataset...')
             # Corpus creation
             if self.args.corpus == 'cornell':
                 cornellData = CornellData(self.corpusDir)
@@ -229,10 +234,10 @@ class TextData:
                 raise "invalid corpus."
 
             # Saving
-            print('Saving dataset...')
+            logger.info('Saving dataset...')
             self.saveDataset(dirName)  # Saving tf samples
         else:
-            print('Loading dataset from {}...'.format(dirName))
+            logger.info('Loading dataset from {}...'.format(dirName))
             self.loadDataset(dirName)
 
         assert self.padToken == 0
@@ -242,8 +247,8 @@ class TextData:
         Args:
             dirName (str): The directory where to load/save the model
         """
-
-        with open(os.path.join(dirName, self.samplesName), 'wb') as handle:
+        dataset_pkl_path = os.path.join(dirName, self.samplesName)
+        with open(dataset_pkl_path, 'wb') as handle:
             data = {  # Warning: If adding something here, also modifying loadDataset
                 "word2id": self.word2id,
                 "id2word": self.id2word,
@@ -259,7 +264,9 @@ class TextData:
         Args:
             dirName (str): The directory where to load the model
         """
-        with open(os.path.join(dirName, self.samplesName), 'rb') as handle:
+        dataset_pkl_path = os.path.join(dirName, self.samplesName)
+        logger.info('dataset pkl: %s' % dataset_pkl_path)
+        with open(dataset_pkl_path, 'rb') as handle:
             # Warning: If adding something here, also modifying saveDataset
             data = pickle.load(handle)
             self.word2id = data["word2id"]
@@ -380,15 +387,15 @@ class TextData:
         Args:
             batch (Batch): a batch object
         """
-        print('----- Print batch -----')
+        logger.info('----- Print batch -----')
         for i in range(len(batch.encoderSeqs[0])):  # Batch size
-            print('Encoder: {}'.format(
+            logger.info('Encoder: {}'.format(
                 self.batchSeq2str(batch.encoderSeqs, seqId=i)))
-            print('Decoder: {}'.format(
+            logger.info('Decoder: {}'.format(
                 self.batchSeq2str(batch.decoderSeqs, seqId=i)))
-            print('Targets: {}'.format(
+            logger.info('Targets: {}'.format(
                 self.batchSeq2str(batch.targetSeqs, seqId=i)))
-            print('Weights: {}'.format(' '.join([str(weight) for weight in [
+            logger.info('Weights: {}'.format(' '.join([str(weight) for weight in [
                   batchWeight[i] for batchWeight in batch.weights]])))
 
     def sequence2str(self, sequence, clean=False, reverse=False):

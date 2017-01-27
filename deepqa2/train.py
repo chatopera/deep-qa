@@ -21,7 +21,7 @@ Author: Hai Liang Wang <hailiang.hl.wang@gmail.com>
 import os
 import tensorflow as tf
 import shutil
-from config import config
+from config import Config
 from tqdm import tqdm
 from utils import log
 from munch import munchify
@@ -29,12 +29,12 @@ from models.rnn import Model
 from dataset.textdata import TextData
 from time import localtime, strftime
 
+config = Config()
 logger = log.getLogger(__name__)
-
 
 def main(unused_argv):
     batch_data = TextData(munchify({
-        'rootDir': config.dataset_root_dir,
+        'rootDir': config.root_dir,
         'corpus': config.corpus_name,
         'maxLength': config.train_max_length,
         'maxLengthEnco': config.train_max_length_enco,

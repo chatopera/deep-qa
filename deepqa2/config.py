@@ -25,8 +25,8 @@ import configparser
 from time import localtime, strftime
 from utils.helper import singleton
 
-CONF_DIR = os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), os.pardir)
+CONF_DIR = os.path.dirname(os.path.dirname(
+    os.path.realpath(__file__)))
 
 
 def get_cfg_dir():
@@ -68,10 +68,10 @@ def read_properties(filename='config.ini'):
     conf = {}
     for x in secs:
         conf[x] = {y: config.get(x, y) for y in config.options(x)}
+    conf['rootDir'] = CONF_DIR
     conf['data'] = {
-        'rootDir': CONF_DIR,
         'save': os.path.join(CONF_DIR, 'save'),
-        'dataset': os.path.join(CONF_DIR, 'data', conf['data']['dataset_name'])}
+        'dataset': os.path.join(CONF_DIR, 'data', 'dataset-%s-%s.pkl' % (conf['corpus']['corpus_name'], conf['corpus']['corpus_max_length']))}
     conf['log']['log_path'] = os.path.join(CONF_DIR, 'logs')
     return conf
 
@@ -87,7 +87,7 @@ class Config:
         '''
         Define project params
         '''
-        self.base_dir = CONF_DIR
+        self.root_dir = self.ini['rootDir']
         self.config_ini_path = get_cfg_path(filename='config.ini')
         self.model_save_tag = "deeplearning.cobra.%s.%s" % (
             socket.gethostname(), strftime("%Y%m%d.%H%M%S", localtime()))
@@ -98,34 +98,25 @@ class Config:
         '''
         Define Corpus
         '''
+        self.corpus_name = self.ini['corpus']['corpus_name']
+        self.corpus_max_length = int(self.ini['corpus']['corpus_max_length'])
+        print('>> Corpus name: %s' % self.corpus_name)
+        print('>> Corpus max length: %s' % self.corpus_max_length)
 
         '''
         Define Dataset
         '''
         if not os.path.exists(self.ini['data']['dataset']):
             raise 'Corpus Data not exists.'
-        print('Start to load corpus ...')
-        with open(self.ini['data']['dataset'], 'rb') as handle:
+        print('Start to load corpus ... %s' % self.ini['data']['dataset'])
+        self.dataset_pkl_path = self.ini['data']['dataset']
+        with open(self.dataset_pkl_path, 'rb') as handle:
             self.dataset = pickle.load(handle)
 
-        self.dataset_root_dir = self.ini['data']['rootDir']
-        self.dataset_pkl_path = self.ini['data']['dataset']
-        self.dataset_word2id = self.dataset["word2id"]
-        self.dataset_id2word = self.dataset["id2word"]
-        self.dataset_trainingSamples = self.dataset["trainingSamples"]
-        self.corpus_name = self.dataset["corpusName"]
-
-        self.dataset_padToken = self.dataset_word2id["<pad>"]
-        self.dataset_goToken = self.dataset_word2id["<go>"]
-        self.dataset_eosToken = self.dataset_word2id["<eos>"]
-        self.dataset_unknownToken = self.dataset_word2id[
-            "<unknown>"]  # Restore special words
-
-        print('>> dataset word2id size: %d' % len(self.dataset_word2id.keys()))
-        print('>> dataset id2word size: %d' % len(self.dataset_id2word.keys()))
-        print('>> dataset training samples size: %d' %
-              len(self.dataset_trainingSamples))
-        print('>> dataset training max length: %d' % self.dataset["maxLength"])
+        print('>> Dataset training max length: %d' % self.dataset["maxLength"])
+        # make sure the generated dataset fit for configuration
+        assert self.corpus_name == self.dataset["corpusName"]
+        assert self.corpus_max_length == self.dataset["maxLength"]
 
         '''
         Define hyper parameters for model training.
@@ -158,10 +149,8 @@ class Config:
         self.train_learning_rate = float(
             self.ini['hyparams']['train_learning_rate'])
 
-config = Config()
-
 if __name__ == "__main__":
     # conf = read_properties()
     # for x in conf['rule']['blacklist']:
     #     print x
-    print(CONF_DIR)
+    print('basedir %s' % config.base_dir)

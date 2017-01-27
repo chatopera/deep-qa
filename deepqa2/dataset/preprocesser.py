@@ -19,41 +19,20 @@ sys.path.append(os.path.join(os.path.dirname(
 import configparser
 from dataset.textdata import TextData
 from munch import munchify
-
-CONF_DIR = os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), os.pardir)
-
-
-def get_cfg_path():
-    '''
-    Get cfg path
-    '''
-    return os.path.join(CONF_DIR, 'config.ini')
-
-
-def load_config():
-    '''
-    Load configurations
-    '''
-    cf = get_cfg_path()
-    if not os.path.exists(cf):
-        f = open(cf, 'w')
-        f.close()
-
-    config = configparser.ConfigParser()
-    config.read(cf)
-    return config
+from config import read_properties
+from utils import log
+logger = log.getLogger(__name__)
+config = read_properties()
 
 
 def main():
-    config = load_config()
-    print('Corpus Name %s' % config.get('corpus', 'corpus_name'))
-    train_max_length = config.getint('corpus', 'corpus_max_length')
+    logger.info('Corpus Name %s' % config['corpus']['corpus_name'])
+    train_max_length = int(config['corpus']['corpus_max_length'])
     train_max_length_enco = train_max_length
     train_max_length_deco = train_max_length + 2
     print('Max Length %d' % train_max_length)
-    td = TextData(munchify({'rootDir': config.get('corpus', 'corpus_path'),
-                            'corpus': config.get('corpus', 'corpus_name'),
+    td = TextData(munchify({'rootDir': config['rootDir'],
+                            'corpus': config['corpus']['corpus_name'],
                             'maxLength': train_max_length,
                             'maxLengthEnco': train_max_length_enco,
                             'maxLengthDeco': train_max_length_deco,
