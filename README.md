@@ -1,6 +1,8 @@
 # Approaching a Chatbot Service
 [Part 1: Introduction](http://www.leiphone.com/news/201702/O9PGyImfH1Vq3fxV.html)
+
 [Part 2: Bot Engine](http://www.leiphone.com/news/201702/oY07cF3HVIp7Yo1s.html)
+
 [Part 3: Bot Model](http://www.leiphone.com/news/201702/4OZau7OfcNO0v1u5.html)
 
 > This repository is align with  **Part 3: Bot Model**.
