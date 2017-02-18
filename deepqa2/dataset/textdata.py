@@ -23,14 +23,17 @@ import pickle  # Saving the data
 import math  # For float comparison
 import os  # Checking file existance
 import random
+import json
 from tqdm import tqdm  # Progress bar
 from dataset.cornelldata import CornellData
+from dataset.egretdata import EgretData
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(
     os.path.realpath(__file__))))
 from utils import log
 
 logger = log.getLogger(__name__)
+
 
 class Batch:
     """Struct containing batches info
@@ -230,6 +233,9 @@ class TextData:
             if self.args.corpus == 'cornell':
                 cornellData = CornellData(self.corpusDir)
                 self.createCorpus(cornellData.getConversations())
+            elif self.args.corpus == 'egret-wenda':
+                egretData = EgretData(self.corpusDir)
+                self.createCorpus(egretData.getConversations())
             else:
                 raise "invalid corpus."
 
@@ -248,16 +254,20 @@ class TextData:
             dirName (str): The directory where to load/save the model
         """
         dataset_pkl_path = os.path.join(dirName, self.samplesName)
+        data = {  # Warning: If adding something here, also modifying loadDataset
+            "word2id": self.word2id,
+            "id2word": self.id2word,
+            "trainingSamples": self.trainingSamples,
+            "maxLength": self.args.maxLength,
+            "corpusName": self.args.corpus
+        }
         with open(dataset_pkl_path, 'wb') as handle:
-            data = {  # Warning: If adding something here, also modifying loadDataset
-                "word2id": self.word2id,
-                "id2word": self.id2word,
-                "trainingSamples": self.trainingSamples,
-                "maxLength": self.args.maxLength,
-                "corpusName": self.args.corpus
-            }
             # Using the highest protocol available
             pickle.dump(data, handle, -1)
+
+        with open(dataset_pkl_path + '.json', 'w') as fp:
+            # Save in json format for fast view
+            json.dump(data, fp)
 
     def loadDataset(self, dirName):
         """Load samples from file
@@ -396,7 +406,7 @@ class TextData:
             logger.info('Targets: {}'.format(
                 self.batchSeq2str(batch.targetSeqs, seqId=i)))
             logger.info('Weights: {}'.format(' '.join([str(weight) for weight in [
-                  batchWeight[i] for batchWeight in batch.weights]])))
+                batchWeight[i] for batchWeight in batch.weights]])))
 
     def sequence2str(self, sequence, clean=False, reverse=False):
         """Convert a list of integer into a human readable string

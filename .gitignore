@@ -11,6 +11,7 @@ save/*
 data/*
 !data/README.md
 !data/cornell
+!data/egret-wenda
 
 # train 
 config.ini
