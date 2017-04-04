@@ -24,6 +24,12 @@ Inspired and inherited from [DeepQA](https://github.com/Conchylicultor/DeepQA/is
 pip install -r requirements.txt
 ```
 
+# Install TensorFlow
+```
+export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc2-cp35-cp35m-linux_x86_64.whl
+pip install —-upgrade $TF_BINARY_URL
+```
+
 # Pre-process data
 Process data, build vocabulary, word embedding, conversations, etc.
 ```
@@ -63,4 +69,15 @@ response
   "rc": 0,
   "msg": "hello"
 }
+```
+
+# Train with Docker
+## Install 
+* [docker](https://docs.docker.com/engine/installation/linux/ubuntu/)
+* [nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
+## Train
+```
+docker pull samurais/deepqa2:latest
+cd DeepQA2
+./scripts/train_with_docker.sh
 ```
