@@ -16,7 +16,7 @@ function printUsage(){
 
 function main() {
     cd $rootDir
-    docker run --name deepqa2  \
+    nvidia-docker run --name deepqa2  \
         -v $rootDir/save:/deepqa2/save \
         -v $rootDir/data:/deepqa2/data \
         -v $rootDir/config.ini:/deepqa2/config.ini \
