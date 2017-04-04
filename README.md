@@ -1,3 +1,5 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/samurais/deepqa2.svg?maxAge=2592000)](https://hub.docker.com/r/samurais/deepqa2/) [![Docker Stars](https://img.shields.io/docker/stars/samurais/deepqa2.svg?maxAge=2592000)](https://hub.docker.com/r/samurais/deepqa2/) [![Docker Layers](https://images.microbadger.com/badges/image/samurais/deepqa2.svg)](https://microbadger.com/#/images/samurais/deepqa2)
+
 # Approaching a Chatbot Service
 [Part 1: Introduction](http://www.leiphone.com/news/201702/O9PGyImfH1Vq3fxV.html)
 
