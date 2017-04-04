@@ -18,10 +18,12 @@ function main() {
     cd $rootDir
     nvidia-docker run --name deepqa2  \
         -v $rootDir/save:/deepqa2/save \
+        -v $rootDir/logs:/deepqa2/logs \
         -v $rootDir/data:/deepqa2/data \
         -v $rootDir/config.ini:/deepqa2/config.ini \
+        -v $rootDir/start_training_docker.sh:/deepqa2/start_training_docker.sh \
         $* samurais/deepqa2:latest \
-        ". /virtualenv/py3.5/bin/activate && python deepqa2/train.py"
+        "./start_training_docker.sh"
 }
 
 # main
