@@ -17,11 +17,11 @@ function printUsage(){
 function main() {
     cd $rootDir
     docker run --name deepqa2  \
-        -e "CHATBOT_SECRET_KEY=myfoobar" \
         -v $rootDir/save:/deepqa2/save \
         -v $rootDir/data:/deepqa2/data \
+        -v $rootDir/config.ini:/deepqa2/config.ini \
         $* samurais/deepqa2:latest \
-        
+        ". /virtualenv/py3.5/bin/activate && python deepqa2/train.py"
 }
 
 # main
@@ -38,4 +38,3 @@ then
 else
     printUsage
 fi
-
