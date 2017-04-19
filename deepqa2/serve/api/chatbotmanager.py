@@ -28,6 +28,10 @@ from dataset.textdata import TextData
 from munch import munchify
 from models.rnn import Model
 
+# force using CPU for serving
+# http://stackoverflow.com/questions/36584907/tensor-flow-toggle-between-cpu-gpu
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
 config = Config()
 logger = logging.getLogger(__name__)
 tf.logging.set_verbosity(tf.logging.DEBUG)

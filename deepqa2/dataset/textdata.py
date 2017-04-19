@@ -24,6 +24,7 @@ import math  # For float comparison
 import os  # Checking file existance
 import random
 import json
+from utils import segmenter
 from tqdm import tqdm  # Progress bar
 from dataset.cornelldata import CornellData
 from dataset.egretdata import EgretData
@@ -334,6 +335,11 @@ class TextData:
         Return:
             list<int>: the list of the word ids of the sentence
         """
+        # try:
+        #     line = segmenter.process_sentence(line).decode('utf-8')
+        #     print('Fix Line:', line)
+        # except:
+        #     pass
         words = []
 
         # Extract sentences
