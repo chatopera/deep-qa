@@ -1,3 +1,9 @@
+# deprecated
+
+If you are interested in further enhancements and investigations, just watch *Next* repo.
+
+[https://github.com/Samurais/Neural\_Conversation\_Models](https://github.com/Samurais/Neural_Conversation_Models)
+
 # Approaching a Chatbot Service
 [Part 1: Introduction](http://www.leiphone.com/news/201702/O9PGyImfH1Vq3fxV.html)
 
