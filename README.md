@@ -1,10 +1,14 @@
-# deprecated
+# Note, this repo is deprecated.
 
 If you are interested in further enhancements and investigations, just watch *Next* repo.
 
 [https://github.com/Samurais/Neural\_Conversation\_Models](https://github.com/Samurais/Neural_Conversation_Models)
 
 # Approaching a Chatbot Service
+[![Join the chat at https://gitter.im/chatbot-pilots/DeepQA](https://badges.gitter.im/chatbot-pilots/DeepQA.svg)](https://gitter.im/chatbot-pilots/DeepQA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Docker Pulls](https://img.shields.io/docker/pulls/samurais/deepqa2.svg?maxAge=2592000)](https://hub.docker.com/r/samurais/deepqa2/) [![Docker Stars](https://img.shields.io/docker/stars/samurais/deepqa2.svg?maxAge=2592000)](https://hub.docker.com/r/samurais/deepqa2/) [![Docker Layers](https://images.microbadger.com/badges/image/samurais/deepqa2.svg)](https://microbadger.com/#/images/samurais/deepqa2)
+
+![](http://7xkeqi.com1.z0.glb.clouddn.com/ai/Screen%20Shot%202017-04-04%20at%208.20.47%20PM.png)
+
 [Part 1: Introduction](http://www.leiphone.com/news/201702/O9PGyImfH1Vq3fxV.html)
 
 [Part 2: Bot Engine](http://www.leiphone.com/news/201702/oY07cF3HVIp7Yo1s.html)
@@ -12,9 +16,6 @@ If you are interested in further enhancements and investigations, just watch *Ne
 [Part 3: Bot Model](http://www.leiphone.com/news/201702/4OZau7OfcNO0v1u5.html)
 
 > This repository is align with  **Part 3: Bot Model**.
-
-# DeepQA2
-[![Join the chat at https://gitter.im/chatbot-pilots/DeepQA](https://badges.gitter.im/chatbot-pilots/DeepQA.svg)](https://gitter.im/chatbot-pilots/DeepQA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Train and serve QA Model with TensorFlow
 
@@ -28,6 +29,12 @@ Inspired and inherited from [DeepQA](https://github.com/Conchylicultor/DeepQA/is
 # Install deps
 ```
 pip install -r requirements.txt
+```
+
+# Install TensorFlow
+```
+export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc2-cp35-cp35m-linux_x86_64.whl
+pip install —-upgrade $TF_BINARY_URL
 ```
 
 # Pre-process data
@@ -69,4 +76,15 @@ response
   "rc": 0,
   "msg": "hello"
 }
+```
+
+# Train with Docker
+## Install 
+* [docker](https://docs.docker.com/engine/installation/linux/ubuntu/)
+* [nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
+## Train
+```
+docker pull samurais/deepqa2:latest
+cd DeepQA2
+./scripts/train_with_docker.sh
 ```
