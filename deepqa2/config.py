@@ -106,8 +106,9 @@ class Config:
         '''
         Define Dataset
         '''
+	print("dataset", self.ini['data']['dataset'])
         if not os.path.exists(self.ini['data']['dataset']):
-            raise 'Corpus Data not exists.'
+            raise Exception('Corpus Data not exists.')
         print('Start to load corpus ... %s' % self.ini['data']['dataset'])
         self.dataset_pkl_path = self.ini['data']['dataset']
         with open(self.dataset_pkl_path, 'rb') as handle:

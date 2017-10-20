@@ -1,6 +1,7 @@
 .vscode/
 *.swp
 *.swo
+*.pyc
 **/__pycache__
 nohup.out
 

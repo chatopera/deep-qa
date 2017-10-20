@@ -59,7 +59,7 @@ class CornellData:
         """
         lines = {}
 
-        with open(fileName, 'r', encoding='iso-8859-1') as f:  # TODO: Solve Iso encoding pb !
+        with open(fileName, 'r') as f:  # TODO: Solve Iso encoding pb !
             for line in f:
                 values = line.split(" +++$+++ ")
 
@@ -82,7 +82,7 @@ class CornellData:
         """
         conversations = []
 
-        with open(fileName, 'r', encoding='iso-8859-1') as f:  # TODO: Solve Iso encoding pb !
+        with open(fileName, 'r') as f:  # TODO: Solve Iso encoding pb !
             for line in f:
                 values = line.split(" +++$+++ ")
 

@@ -268,7 +268,7 @@ class TextData:
 
         with open(dataset_pkl_path + '.json', 'w') as fp:
             # Save in json format for fast view
-            json.dump(data, fp)
+            json.dump(data, fp, ensure_ascii=False, encoding='utf8')
 
     def loadDataset(self, dirName):
         """Load samples from file
@@ -319,10 +319,11 @@ class TextData:
         for i in range(len(conversation["lines"]) - 1):
             inputLine = conversation["lines"][i]
             targetLine = conversation["lines"][i + 1]
-
-            inputWords = self.extractText(inputLine["text"])
-            targetWords = self.extractText(targetLine["text"], True)
-
+	    try:
+		inputWords = self.extractText(inputLine["text"])
+		targetWords = self.extractText(targetLine["text"], True)
+	    except:
+		continue
             # Filter wrong samples (if one of the list is empty)
             if inputWords and targetWords:
                 self.trainingSamples.append([inputWords, targetWords])
