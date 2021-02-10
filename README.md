@@ -4,6 +4,23 @@ If you are interested in further enhancements and investigations, just watch *Ne
 
 [https://github.com/Samurais/Neural\_Conversation\_Models](https://github.com/Samurais/Neural_Conversation_Models)
 
+
+# 自然语言处理推荐入门&工具书
+
+本书由 [deep-qa](https://github.com/chatopera/deep-qa) 作者参与著作。
+
+<p align="center">
+  <b>快速购书<a href="https://item.jd.com/12479014.html" target="_blank">链接</a></b><br>
+  <a href="https://item.jd.com/12479014.html" target="_blank">
+  <img src="https://user-images.githubusercontent.com/3538629/48657619-bcd24880-ea6e-11e8-8c4e-8bcb00761942.png" width="400">      
+  </a>
+</p>
+
+[《智能问答与深度学习》](https://item.jd.com/12479014.html) 这本书是服务于准备入门机器学习和自然语言处理的学生和软件工程师的，在理论上介绍了很多原理、算法，同时也提供很多示例程序增加实践性，这些程序被汇总到示例程序代码库，这些程序主要是帮助大家理解原理和算法的，欢迎大家下载和执行。代码库的地址是：
+
+[https://github.com/l11x0m7/book-of-qna-code](https://github.com/l11x0m7/book-of-qna-code)
+
+
 # Approaching a Chatbot Service
 [![Join the chat at https://gitter.im/chatbot-pilots/DeepQA](https://badges.gitter.im/chatbot-pilots/DeepQA.svg)](https://gitter.im/chatbot-pilots/DeepQA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Docker Pulls](https://img.shields.io/docker/pulls/samurais/deepqa2.svg?maxAge=2592000)](https://hub.docker.com/r/samurais/deepqa2/) [![Docker Stars](https://img.shields.io/docker/stars/samurais/deepqa2.svg?maxAge=2592000)](https://hub.docker.com/r/samurais/deepqa2/) [![Docker Layers](https://images.microbadger.com/badges/image/samurais/deepqa2.svg)](https://microbadger.com/#/images/samurais/deepqa2)
 
