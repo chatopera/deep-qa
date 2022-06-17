@@ -8,7 +8,7 @@ djangorestframework==3.5.3
 jieba==0.38
 munch==2.1.0
 nltk==3.2.1
-numpy==1.11.3
+numpy==1.21.0
 six==1.10.0
 terminado==0.6
 tqdm==4.10.0
